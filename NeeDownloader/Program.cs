@@ -26,6 +26,8 @@ namespace Nee
             Program pg = new Program();
 
 
+            Console.WriteLine("\n 1- Get Images \n 2- Get Videos");
+            string downloadType = Console.ReadLine();
             Console.WriteLine("\n 1- Get 1 By 1 \n 2- continue batching");
             int choice = int.Parse(Console.ReadLine());
 
@@ -38,52 +40,57 @@ namespace Nee
 
             pg.BaseLocation = pg.BaseLocation + subFolder + "\\";
 
-            if (choice == 1)
+            Console.WriteLine("**********************************");
+            Console.WriteLine("Enter the URL you want to download..");
+            string userUrl = Console.ReadLine();
+
+            if (downloadType == "1")
             {
 
-                Console.WriteLine("Enter a URL");
-                string url = Console.ReadLine();
-
-                pg.GoAndDownload(url);
-
-            }
-            else if (choice == 2)
-            {
-                Console.WriteLine("**********************************");
-                Console.WriteLine("Enter the URL you want to download..");
-                string userUrl = Console.ReadLine();
-                Console.WriteLine("Enter the page number you want to start with..");
-                int userPage = int.Parse(Console.ReadLine());
-
-                //string baseUrl = "https://neek.info/posts/category/maharem?page=";
-                string baseUrl = userUrl + "?page=";
-
-                for (int page = userPage; page < 100; page++)
+                if (choice == 1)
                 {
-                    pg.chrome.Navigate().GoToUrl(baseUrl + page);
-                    pg.MainWindow = pg.chrome.CurrentWindowHandle;
+                    pg.GoAndDownload(userUrl);
+                }
+                else if (choice == 2)
+                {
+                    Console.WriteLine("Enter the page number you want to start with..");
+                    int userPage = int.Parse(Console.ReadLine());
 
-                    Thread.Sleep(5000);
+                    string baseUrl = userUrl + "?page=";
 
-                    ReadOnlyCollection<IWebElement> anchorElements = pg.chrome.FindElements(By.XPath("//article/a"));
-                    if (anchorElements.Count != 0)
+                    for (int page = userPage; page < 100; page++)
                     {
-                        var URLs = pg.img.GetURLsFromAnchor(anchorElements);
-                        pg.GoAndDownload(URLs);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Finished !!");
-                        break;
+                        pg.chrome.Navigate().GoToUrl(baseUrl + page);
+                        pg.MainWindow = pg.chrome.CurrentWindowHandle;
+
+                        Thread.Sleep(5000);
+
+                        ReadOnlyCollection<IWebElement> anchorElements = pg.chrome.FindElements(By.XPath("//article/a"));
+                        if (anchorElements.Count != 0)
+                        {
+                            var URLs = pg.img.GetURLsFromAnchor(anchorElements);
+                            pg.GoAndDownload(URLs);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Finished !!");
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    Console.WriteLine("fuck you!");
+                }
+
+                pg.chrome.Quit();
             }
-            else
+            else if (downloadType == "2")
             {
-                Console.WriteLine("fuck you!");
+
             }
 
-            pg.chrome.Quit();
+
 
         }
 
