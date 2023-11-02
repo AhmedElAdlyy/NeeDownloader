@@ -10,21 +10,33 @@ using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.IO;
 using System.Transactions;
+using NeeDownloader;
 
 namespace Nee
 {
     class Program
     {
         public ChromeDriver chrome = new ChromeDriver();
-        public string BaseLocation = "D:\\AHMED EL ADLY\\Media\\Tabo\\";
+        public string BaseLocation = "D:\\AHMED EL ADLY\\Media\\";
         public string MainWindow = "";
-
+        public AssistantClass assistant = new AssistantClass();
+        public ImageHandlerClass img = new ImageHandlerClass();
         static void Main(string[] args)
         {
             Program pg = new Program();
 
+
             Console.WriteLine("\n 1- Get 1 By 1 \n 2- continue batching");
             int choice = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Your are saving to AHMED EL ADly => Media \n " +
+                "Enter a sub folder to creare and save to");
+
+            string subFolder = Console.ReadLine();
+
+            Directory.CreateDirectory(pg.BaseLocation + subFolder);
+
+            pg.BaseLocation = pg.BaseLocation + subFolder + "\\";
 
             if (choice == 1)
             {
@@ -56,7 +68,7 @@ namespace Nee
                     ReadOnlyCollection<IWebElement> anchorElements = pg.chrome.FindElements(By.XPath("//article/a"));
                     if (anchorElements.Count != 0)
                     {
-                        var URLs = pg.GetURLsFromAnchor(anchorElements);
+                        var URLs = pg.img.GetURLsFromAnchor(anchorElements);
                         pg.GoAndDownload(URLs);
                     }
                     else
@@ -75,17 +87,6 @@ namespace Nee
 
         }
 
-
-        private List<string> GetURLsFromAnchor(ReadOnlyCollection<IWebElement> anchorElements)
-        {
-            List<string> URLs = new List<string>();
-            foreach (var anchorElement in anchorElements)
-            {
-                URLs.Add(anchorElement.GetAttribute("href"));
-            }
-
-            return URLs;
-        }
 
         private void GoAndDownload(List<string> URLs)
         {
@@ -119,12 +120,12 @@ namespace Nee
                 {
                     var imagesElements = this.chrome.FindElements(By.XPath("//div[@class='post-body']//div[@class='separator']/a/img"));
                     string albumName = this.chrome.FindElement(By.XPath("//div[@class='post-img']/h3")).Text.ToString();
-                    List<string> srcUrls = GetImagesURLs(imagesElements);
+                    List<string> srcUrls = img.GetImagesURLs(imagesElements);
                     Thread.Sleep(5000);
                     this.chrome.Close();
                     this.chrome.SwitchTo().Window(this.MainWindow);
 
-                    DownloadImages(srcUrls, albumName);
+                    img.DownloadImages(srcUrls, albumName, BaseLocation);
                 }
 
             }
@@ -159,87 +160,12 @@ namespace Nee
             {
                 var imagesElements = this.chrome.FindElements(By.XPath("//div[@class='post-body']//div[@class='separator']/a/img"));
                 string albumName = this.chrome.FindElement(By.XPath("//div[@class='post-img']/h3")).Text.ToString();
-                List<string> srcUrls = GetImagesURLs(imagesElements);
+                List<string> srcUrls = img.GetImagesURLs(imagesElements);
                 Thread.Sleep(5000);
-                DownloadImages(srcUrls, albumName);
+                img.DownloadImages(srcUrls, albumName, BaseLocation);
                 Thread.Sleep(5000);
                 this.chrome.Quit();
             }
-
-
-        }
-
-        private List<string> GetImagesURLs(ReadOnlyCollection<IWebElement> ImagesElements)
-        {
-            List<string> srcUrls = new List<string>();
-            foreach (var ImageElement in ImagesElements)
-            {
-                srcUrls.Add(ImageElement.GetAttribute("src"));
-            }
-
-            return srcUrls;
-        }
-
-        private void DownloadImages(List<string> ImagesSrcs, string albumName)
-        {
-            WebClient client = new WebClient();
-            var subFolder = GetNextFolderName().ToString();
-            var currentBase = "";
-
-
-            for (int i = 0; i < ImagesSrcs.Count(); i++)
-            {
-                try
-                {
-                    var imageData = client.DownloadData(ImagesSrcs[i]);
-                    if (i == 0)
-                    {
-                        Directory.CreateDirectory(this.BaseLocation + "\\" + subFolder + "-" + albumName);
-                        currentBase = this.BaseLocation + "\\" + subFolder + "-" + albumName + "\\";
-                    }
-
-                    File.WriteAllBytes(currentBase + i + ".jpg", imageData);
-                    string log = "Image => " + i + ".jpg has been saved to => " + currentBase;
-                    File.AppendAllText("Save.log", log + "\n");
-                }
-                catch (Exception)
-                {
-
-                    Console.WriteLine($"error getting Image {i} Album 404 : {albumName}");
-                }
-
-            }
-
-
-        }
-
-        private int GetNextFolderName()
-        {
-            int nextFolder = 0;
-            string[] foldersPaths = Directory.GetDirectories(this.BaseLocation);
-            List<string> folders = new List<string>();
-
-            foreach (var path in foldersPaths)
-            {
-                folders.Add(path.Substring(path.LastIndexOf("\\") + 1));
-            }
-
-            if (folders.Count == 0)
-            {
-                nextFolder = 1;
-            }
-            else
-            {
-                for (int i = 0; i < folders.Count; i++)
-                {
-                    folders[i] = folders[i].Substring(0, folders[i].IndexOf("-"));
-                }
-
-                List<int> myInt = folders.Select(int.Parse).ToList();
-                nextFolder = myInt.Max() + 1;
-            }
-
-            return nextFolder;
         }
 
 
