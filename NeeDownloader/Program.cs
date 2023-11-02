@@ -11,12 +11,14 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using System.Transactions;
 using NeeDownloader;
+using System.ComponentModel.Design;
 
 namespace Nee
 {
     class Program
     {
-        public ChromeDriver chrome = new ChromeDriver();
+
+        public ChromeDriver chrome;
         public string BaseLocation = "D:\\AHMED EL ADLY\\Media\\";
         public string MainWindow = "";
         public AssistantClass assistant = new AssistantClass();
@@ -25,6 +27,20 @@ namespace Nee
         static void Main(string[] args)
         {
             Program pg = new Program();
+
+            Console.WriteLine("\n your session type : \n 1- Visible \n 2- hidden \n ?");
+            string sessionType = Console.ReadLine();
+
+            if (sessionType == "1")
+            {
+                pg.chrome = new ChromeDriver();
+            }
+            else if (sessionType == "2")
+            {
+                var opts = new ChromeOptions();
+                opts.AddArgument("--headless=new");
+                pg.chrome = new ChromeDriver(opts);
+            }
 
 
             Console.WriteLine("\n 1- Get Images \n 2- Get Videos");
