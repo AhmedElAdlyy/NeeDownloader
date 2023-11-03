@@ -46,7 +46,7 @@ namespace NeeDownloader
 
             client.Headers.Add("authority", "rr4---sn-hgn7ynek.googlevideo.com");
             client.Headers.Add("method", "GET");
-            client.Headers.Add("path", videoSrc.Remove(0,videoSrc.IndexOf(".com")));
+            client.Headers.Add("path", videoSrc.Remove(0, videoSrc.IndexOf(".com")));
             client.Headers.Add("scheme", "https");
             client.Headers.Add("Accept", "*/*");
             client.Headers.Add("Accept-Encoding", "identity;q=1, *;q=0");
@@ -66,14 +66,14 @@ namespace NeeDownloader
 
             try
             {
-
-                 var videoDate = client.DownloadData(videoSrc);
-                Console.WriteLine("Downloading Video");
+                Console.WriteLine($"Starting Downloading Video... {subFolder} - {videoName}");
+                var videoDate = client.DownloadData(videoSrc);
+                Console.WriteLine($"Video {subFolder} - {videoName} Downloaded !!");
                 File.WriteAllBytes(baseLocation + "\\" + subFolder + "- " + videoName + ".mp4", videoDate);
             }
             catch (WebException ex)
             {
-                if(ex.Response != null)
+                if (ex.Response != null)
                 {
                     Console.WriteLine("Exception");
                     Console.WriteLine(ex);
