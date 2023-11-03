@@ -43,6 +43,7 @@ namespace NeeDownloader
         public void DownloadVideo(string videoSrc, string videoName, string baseLocation)
         {
             WebClient client = new WebClient();
+            client.DownloadProgressChanged += DownloadProgressHandler;
 
             client.Headers.Add("authority", "rr4---sn-hgn7ynek.googlevideo.com");
             client.Headers.Add("method", "GET");
@@ -67,9 +68,11 @@ namespace NeeDownloader
             try
             {
                 Console.WriteLine($"Starting Downloading Video... {subFolder} - {videoName}");
-                var videoDate = client.DownloadData(videoSrc);
+                //var videoDate = client.DownloadData(videoSrc);
+                string outputPath = baseLocation + "\\" + subFolder + "- " + videoName + ".mp4";
+                client.DownloadFile(videoSrc,outputPath);
                 Console.WriteLine($"Video {subFolder} - {videoName} Downloaded !!");
-                File.WriteAllBytes(baseLocation + "\\" + subFolder + "- " + videoName + ".mp4", videoDate);
+                //File.WriteAllBytes(baseLocation + "\\" + subFolder + "- " + videoName + ".mp4", videoDate);
             }
             catch (WebException ex)
             {
@@ -83,6 +86,10 @@ namespace NeeDownloader
                     var details = reader.ReadToEnd();
                     Console.Write(details);
                 }
+            }
+            finally
+            {
+                client.Dispose();
             }
 
 
@@ -103,6 +110,12 @@ namespace NeeDownloader
             {
                 return false;
             }
+        }
+
+        private static void DownloadProgressHandler(object sender, DownloadProgressChangedEventArgs e)
+        {
+            double pre = (double)e.BytesReceived / e.TotalBytesToReceive * 100;
+            Console.WriteLine($"Downloaded => {e.BytesReceived / 1024} KB of ${e.TotalBytesToReceive / 1024} KB (${pre:F2}%)");
         }
 
 
