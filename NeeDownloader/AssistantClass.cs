@@ -38,5 +38,39 @@ namespace NeeDownloader
         }
 
 
+        public int GetNextVideoName(string baseLocation)
+        {
+            int nextVid = 0;
+            DirectoryInfo dir = new DirectoryInfo(baseLocation);
+            FileInfo[] vids = dir.GetFiles();
+
+            if (vids.Count() == 0)
+            {
+                nextVid = 1;
+            }
+            else
+            {
+                List<string> filesNames = new List<string>();
+
+                foreach (var vid in vids)
+                {
+                    filesNames.Add(vid.Name);
+                }
+
+                for (int i = 0; i < filesNames.Count; i++)
+                {
+                    filesNames[i] = filesNames[i].Substring(0, filesNames[i].IndexOf("-"));
+                }
+
+                List<int> myInt = filesNames.Select(int.Parse).ToList();
+                nextVid = myInt.Max() + 1;
+            }
+
+
+            return nextVid;
+
+        }
+
+
     }
 }

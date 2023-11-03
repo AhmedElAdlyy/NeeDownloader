@@ -62,7 +62,7 @@ namespace NeeDownloader
 
 
 
-            var subFolder = assistant.GetNextFolderName(baseLocation).ToString();
+            var subFolder = assistant.GetNextVideoName(baseLocation).ToString();
 
             try
             {
