@@ -119,7 +119,7 @@ namespace Nee
             {
                 if (choice == 1)
                 {
-                    Console.WriteLine("Downloading one Video");
+                    pg.GoAndDownloadOneVideo(userUrl);
 
                 }
                 else if (choice == 2)
@@ -162,6 +162,45 @@ namespace Nee
 
         }
 
+        /***********************************************************************************************/
+        private void GoAndDownloadOneVideo(string videoUri)
+        {
+
+            this.chrome.Navigate().GoToUrl(videoUri);
+
+            bool IsNeedRefresh = IsElementExist(By.XPath("//body/div[@id='sf-resetcontent']/h1"));
+
+            while (IsNeedRefresh)
+            {
+                this.chrome.Navigate().Refresh();
+                Thread.Sleep(5000);
+                if (!IsElementExist(By.XPath("//body/div[@id='sf-resetcontent']/h1")))
+                    break;
+            }
+
+            bool IsNeedSubscribe = IsElementExist(By.Id("button"));
+
+            if (IsNeedSubscribe)
+            {
+                Console.WriteLine("Subscription is required will get you out of the shit");
+                this.chrome.Close();
+                this.chrome.SwitchTo().Window(this.MainWindow);
+            }
+            
+            var videoName = this.chrome.FindElement(By.TagName("meta")).GetDomAttribute("content");
+
+            var iframeSrc = this.chrome.FindElement(By.TagName("iframe")).GetAttribute("src");
+
+            string videoUrl = GetVideoUrlFromiFrame(iframeSrc, this.chrome.CurrentWindowHandle);
+
+            this.chrome.Quit();
+
+            vid.DownloadVideo(videoUrl, videoName, BaseLocation);
+        }
+
+
+        /***********************************************************************************************/
+
 
         private void GoAndDownload(List<VideoInformationViewModel> videosInfo)
         {
@@ -199,9 +238,9 @@ namespace Nee
 
                 vid.DownloadVideo(videoUrl, video.VideoName, BaseLocation);
 
-
             }
         }
+
 
 
         private void GoAndDownload(List<string> URLs, string downloadType, List<string> VideosNames = null)
