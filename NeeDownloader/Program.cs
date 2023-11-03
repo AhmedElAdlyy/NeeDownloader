@@ -27,17 +27,30 @@ namespace Nee
         static void Main(string[] args)
         {
             Program pg = new Program();
+            var opts = new ChromeOptions();
 
             Console.WriteLine("\n your session type : \n 1- Visible \n 2- hidden \n ?");
             string sessionType = Console.ReadLine();
 
+
             if (sessionType == "1")
             {
-                pg.chrome = new ChromeDriver();
+                Console.WriteLine("\n Do you need developer tools? \n 1- YES \n 2- NO");
+                string withDevTools = Console.ReadLine();
+
+                if (withDevTools == "1")
+                {
+                    opts.AddArgument("--auto-open-devtools-for-tabs");
+                    pg.chrome = new ChromeDriver(opts);
+                }
+                else if (withDevTools == "2")
+                {
+                    pg.chrome = new ChromeDriver();
+                }
+
             }
             else if (sessionType == "2")
             {
-                var opts = new ChromeOptions();
                 opts.AddArgument("--headless=new");
                 pg.chrome = new ChromeDriver(opts);
             }

@@ -25,10 +25,13 @@ namespace NeeDownloader
 
                 if (isExist)
                 {
+
+
                     VideoInformationViewModel info = new VideoInformationViewModel
                     {
                         VideoUrl = articleElement.FindElement(By.ClassName("block-thumbnail")).GetAttribute("href"),
-                        VideoName = articleElement.FindElement(By.XPath("//div[@class='details']/h2")).Text
+                        //VideoName = articleElement.FindElement(By.XPath("//div[@class='details']/h2")).Text
+                        VideoName = articleElement.FindElement(By.TagName("h2")).Text
                     };
                     infos.Add(info);
                 }
@@ -41,18 +44,48 @@ namespace NeeDownloader
         public void DownloadVideo(string videoSrc, string videoName, string baseLocation)
         {
             WebClient client = new WebClient();
-            client.Headers.Set(HttpRequestHeader.Accept, "*/*");
-            client.Headers.Set(HttpRequestHeader.AcceptEncoding, "identity;q=1, *;q=0");
-            client.Headers.Set(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.9");
-            client.Headers.Set(HttpRequestHeader.Range, "bytes=0-");
-            client.Headers.Set(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36");
+
+            client.Headers.Add("authority", "rr4---sn-hgn7ynek.googlevideo.com");
+            client.Headers.Add("method", "GET");
+            client.Headers.Add("path", videoSrc.Remove(0,videoSrc.IndexOf(".com")));
+            client.Headers.Add("scheme", "https");
+            client.Headers.Add("Accept", "*/*");
+            client.Headers.Add("Accept-Encoding", "identity;q=1, *;q=0");
+            client.Headers.Add("Accept-Language", "en-US,en;q=0.9");
+            client.Headers.Add("Referer", videoSrc);
+            client.Headers.Add("Sec-Ch-Ua", "\"Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
+            client.Headers.Add("Sec-Ch-Ua-Mobile", "?0");
+            client.Headers.Add("Sec-Ch-Ua-Platform", "Windows");
+            client.Headers.Add("Sec-Fetch-Dest", "video");
+            client.Headers.Add("Sec-Fetch-Mode", "no-cors");
+            client.Headers.Add("Sec-Fetch-Site", "same-origin");
+            client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
 
 
 
             var subFolder = assistant.GetNextFolderName(baseLocation).ToString();
 
-            var videoDate = client.DownloadData(videoSrc);
-            File.WriteAllBytes(baseLocation + "\\" + subFolder + "- " + videoName + ".mp4", videoDate);
+            try
+            {
+
+                 var videoDate = client.DownloadData(videoSrc);
+                Console.WriteLine("Downloading Video");
+                File.WriteAllBytes(baseLocation + "\\" + subFolder + "- " + videoName + ".mp4", videoDate);
+            }
+            catch (WebException ex)
+            {
+                if(ex.Response != null)
+                {
+                    Console.WriteLine("Exception");
+                    Console.WriteLine(ex);
+                    var response = ex.Response;
+                    var ds = response.GetResponseStream();
+                    var reader = new StreamReader(ds);
+                    var details = reader.ReadToEnd();
+                    Console.Write(details);
+                }
+            }
+
 
             string log = "Video => " + videoName + ".mp4 has been saved to => " + baseLocation;
             File.AppendAllText("Save_video.log", log + "\n");
