@@ -30,7 +30,6 @@ namespace NeeDownloader
                     VideoInformationViewModel info = new VideoInformationViewModel
                     {
                         VideoUrl = articleElement.FindElement(By.ClassName("block-thumbnail")).GetAttribute("href"),
-                        //VideoName = articleElement.FindElement(By.XPath("//div[@class='details']/h2")).Text
                         VideoName = articleElement.FindElement(By.TagName("h2")).Text
                     };
                     infos.Add(info);

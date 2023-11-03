@@ -139,8 +139,7 @@ namespace Nee
                         ReadOnlyCollection<IWebElement> articleElements = pg.chrome.FindElements(By.XPath("//article[@class='block']"));
                         if (articleElements.Count != 0)
                         {
-                            //Console.WriteLine(articleElements.Count);
-                            //Thread.Sleep(50000);
+
                             List<VideoInformationViewModel> VideosInformations = pg.vid.GetURLsFromArticles(articleElements);
                             pg.GoAndDownload(VideosInformations);
                         }
