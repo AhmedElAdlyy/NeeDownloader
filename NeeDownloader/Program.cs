@@ -186,7 +186,7 @@ namespace Nee
                 this.chrome.Close();
                 this.chrome.SwitchTo().Window(this.MainWindow);
             }
-            
+
             var videoName = this.chrome.FindElement(By.TagName("meta")).GetDomAttribute("content");
 
             var iframeSrc = this.chrome.FindElement(By.TagName("iframe")).GetAttribute("src");
@@ -204,9 +204,26 @@ namespace Nee
 
         private void GoAndDownload(List<VideoInformationViewModel> videosInfo)
         {
+            int maxAttempts = 50;
+            int attempts = 0;
             foreach (var video in videosInfo)
             {
-                this.chrome.SwitchTo().NewWindow(WindowType.Tab);
+                while (attempts < maxAttempts)
+                {
+                    try
+                    {
+                        this.chrome.SwitchTo().NewWindow(WindowType.Tab);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Attempt {attempts + 1} failed: {e.Message}");
+                        attempts++;
+                        this.chrome.Close();
+                        this.chrome.SwitchTo().Window(this.MainWindow);
+                    }
+                }
+
                 this.chrome.Navigate().GoToUrl(video.VideoUrl);
 
                 bool IsNeedRefresh = IsElementExist(By.XPath("//body/div[@id='sf-resetcontent']/h1"));
@@ -363,7 +380,25 @@ namespace Nee
 
         private string GetVideoUrlFromiFrame(string iframeSrc, string backWindow)
         {
-            this.chrome.SwitchTo().NewWindow(WindowType.Tab);
+            int maxAttempts = 50;
+            int attempts = 0;
+
+            while (attempts<maxAttempts)
+            {
+                try
+                {
+                    this.chrome.SwitchTo().NewWindow(WindowType.Tab);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Attempt {attempts + 1} failed: {e.Message}");
+                    attempts++;
+                    this.chrome.Close();
+                    this.chrome.SwitchTo().Window(backWindow);
+                }
+            }
+            
             this.chrome.Navigate().GoToUrl(iframeSrc);
 
             string videoUrl = this.chrome.FindElement(By.TagName("video")).GetAttribute("src");
