@@ -29,6 +29,15 @@ namespace Nee
             Program pg = new Program();
             var opts = new ChromeOptions();
 
+            Console.WriteLine("\n Do you need a VPN? \n 1- YES \n 2- No");
+            string withVPN = Console.ReadLine();
+
+            if (withVPN == "1")
+            {
+                opts.AddExtension("C:\\Users\\ahmed\\Desktop\\2.7.3_0.crx");
+                pg.chrome = new ChromeDriver(opts);
+            }
+
             Console.WriteLine("\n your session type : \n 1- Visible \n 2- hidden \n ?");
             string sessionType = Console.ReadLine();
 
@@ -54,6 +63,9 @@ namespace Nee
                 opts.AddArgument("--headless=new");
                 pg.chrome = new ChromeDriver(opts);
             }
+
+
+            
 
 
             Console.WriteLine("\n 1- Get Images \n 2- Get Videos");
@@ -383,7 +395,7 @@ namespace Nee
             int maxAttempts = 50;
             int attempts = 0;
 
-            while (attempts<maxAttempts)
+            while (attempts < maxAttempts)
             {
                 try
                 {
@@ -398,7 +410,7 @@ namespace Nee
                     this.chrome.SwitchTo().Window(backWindow);
                 }
             }
-            
+
             this.chrome.Navigate().GoToUrl(iframeSrc);
 
             string videoUrl = this.chrome.FindElement(By.TagName("video")).GetAttribute("src");
