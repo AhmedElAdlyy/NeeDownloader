@@ -12,6 +12,7 @@ using System.IO;
 using System.Transactions;
 using NeeDownloader;
 using System.ComponentModel.Design;
+using NeeDownloader.ViewModels;
 
 namespace Nee
 {
@@ -29,43 +30,33 @@ namespace Nee
             Program pg = new Program();
             var opts = new ChromeOptions();
 
-            Console.WriteLine("\n Do you need a VPN? \n 1- YES \n 2- No");
-            string withVPN = Console.ReadLine();
-
-            if (withVPN == "1")
-            {
-                opts.AddExtension("C:\\Users\\ahmed\\Desktop\\2.7.3_0.crx");
-                pg.chrome = new ChromeDriver(opts);
-            }
-
-            Console.WriteLine("\n your session type : \n 1- Visible \n 2- hidden \n ?");
-            string sessionType = Console.ReadLine();
 
 
-            if (sessionType == "1")
-            {
-                Console.WriteLine("\n Do you need developer tools? \n 1- YES \n 2- NO");
-                string withDevTools = Console.ReadLine();
+            ChromeOptionsViewModels chromeOpts = pg.assistant.HandleChromeOptions();
 
-                if (withDevTools == "1")
-                {
-                    opts.AddArgument("--auto-open-devtools-for-tabs");
-                    pg.chrome = new ChromeDriver(opts);
-                }
-                else if (withDevTools == "2")
-                {
-                    pg.chrome = new ChromeDriver();
-                }
-
-            }
-            else if (sessionType == "2")
-            {
+            if(chromeOpts.IsHidden)
                 opts.AddArgument("--headless=new");
+
+            if(chromeOpts.WithDevTool)
+                opts.AddArgument("--auto-open-devtools-for-tabs");
+
+            if(chromeOpts.WithVPN)
+                opts.AddExtension("C:\\Users\\ahmed\\Desktop\\2.7.3_0.crx");
+
+
+            if (chromeOpts.GetSummary())
+            {
                 pg.chrome = new ChromeDriver(opts);
             }
-
-
+            else
+            {
+                pg.chrome = new ChromeDriver();
+            }
             
+
+
+
+
 
 
             Console.WriteLine("\n 1- Get Images \n 2- Get Videos");

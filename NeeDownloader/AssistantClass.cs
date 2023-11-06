@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NeeDownloader.ViewModels;
+using OpenQA.Selenium.DevTools.V117.Debugger;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,9 +68,35 @@ namespace NeeDownloader
                 nextVid = myInt.Max() + 1;
             }
 
-
             return nextVid;
+        }
 
+        public ChromeOptionsViewModels HandleChromeOptions()
+        {
+            ChromeOptionsViewModels options = new ChromeOptionsViewModels();
+
+            Console.WriteLine("\n Do you need a VPN? \n 1- YES \n 2- No");
+            options.WithVPN = Console.ReadLine() == "1" ? true : false;
+
+            if (options.WithVPN)
+            {
+                options.IsHidden = false;
+                Console.WriteLine("Your session will be visible automatically");
+            }
+            else
+            {
+                Console.WriteLine("\n your session type : \n 1- Visible \n 2- hidden \n ?");
+                options.IsHidden = Console.ReadLine() == "2" ? true : false;
+            }
+
+
+            if (!options.IsHidden)
+            {
+                Console.WriteLine("\n Do you need developer tools? \n 1- YES \n 2- NO");
+                options.WithDevTool = Console.ReadLine() == "1" ? true : false;
+            }
+
+            return options;
         }
 
 
