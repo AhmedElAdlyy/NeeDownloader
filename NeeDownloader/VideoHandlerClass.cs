@@ -41,11 +41,12 @@ namespace NeeDownloader
             return infos;
         }
 
-        public void DownloadVideo(string videoSrc, string videoName, string baseLocation)
+        public void DownloadVideo(OneVideoAttributesToDownload attributes)
         {
-            if (videoSrc == "")
+            if (attributes.VideoUrl == "")
             {
                 Console.WriteLine("Video is not found");
+                Thread.Sleep(6000);
             }
             else
             {
@@ -54,12 +55,20 @@ namespace NeeDownloader
 
                 client.Headers.Add("authority", "rr4---sn-hgn7ynek.googlevideo.com");
                 client.Headers.Add("method", "GET");
-                client.Headers.Add("path", videoSrc.Remove(0, videoSrc.IndexOf(".com")));
+                if (attributes.VideoUrl.Contains(".com"))
+                {
+                    client.Headers.Add("path", attributes.VideoUrl.Remove(0, attributes.VideoUrl.IndexOf(".com")));
+                }
+                else
+                {
+                    client.Headers.Add("path", attributes.VideoUrl.Remove(0, attributes.VideoUrl.IndexOf(".info")));
+                }
+                
                 client.Headers.Add("scheme", "https");
                 client.Headers.Add("Accept", "*/*");
                 client.Headers.Add("Accept-Encoding", "identity;q=1, *;q=0");
                 client.Headers.Add("Accept-Language", "en-US,en;q=0.9");
-                client.Headers.Add("Referer", videoSrc);
+                client.Headers.Add("Referer", attributes.VideoUrl);
                 client.Headers.Add("Sec-Ch-Ua", "\"Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
                 client.Headers.Add("Sec-Ch-Ua-Mobile", "?0");
                 client.Headers.Add("Sec-Ch-Ua-Platform", "Windows");
@@ -70,14 +79,14 @@ namespace NeeDownloader
 
 
 
-                var subFolder = assistant.GetNextVideoName(baseLocation).ToString();
+                var subFolder = assistant.GetNextVideoName(attributes.BaseLocation).ToString();
 
                 try
                 {
-                    Console.WriteLine($"Starting Downloading Video... {subFolder} - {videoName}");
-                    var videoDate = client.DownloadData(videoSrc);
-                    string outputPath = baseLocation + "\\" + subFolder + "- " + videoName.Replace("\t", " ").Replace("\n", " ").Replace("\r", "") + ".mp4";
-                    Console.WriteLine($"Video {subFolder} - {videoName} Downloaded !!");
+                    Console.WriteLine($"Starting Downloading Video... {subFolder} - {attributes.VideoName}");
+                    var videoDate = client.DownloadData(attributes.VideoUrl);
+                    string outputPath = attributes.BaseLocation + "\\" + subFolder + "- " + attributes.VideoName.Replace("\t", " ").Replace("\n", " ").Replace("\r", "") + ".mp4";
+                    Console.WriteLine($"Video {subFolder} - {attributes.VideoName} Downloaded !!");
                     File.WriteAllBytes(outputPath, videoDate);
                 }
                 catch (WebException ex)
@@ -99,7 +108,7 @@ namespace NeeDownloader
                 }
 
 
-                string log = "Video => " + videoName + ".mp4 has been saved to => " + baseLocation;
+                string log = "Video => " + attributes.VideoName + ".mp4 has been saved to => " + attributes.BaseLocation;
                 File.AppendAllText("Save_video.log", log + "\n");
             }
 

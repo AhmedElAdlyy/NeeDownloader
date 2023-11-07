@@ -13,6 +13,7 @@ using System.Transactions;
 using NeeDownloader;
 using System.ComponentModel.Design;
 using NeeDownloader.ViewModels;
+using System.Xml.Linq;
 
 namespace Nee
 {
@@ -34,13 +35,13 @@ namespace Nee
 
             ChromeOptionsViewModels chromeOpts = pg.assistant.HandleChromeOptions();
 
-            if(chromeOpts.IsHidden)
+            if (chromeOpts.IsHidden)
                 opts.AddArgument("--headless=new");
 
-            if(chromeOpts.WithDevTool)
+            if (chromeOpts.WithDevTool)
                 opts.AddArgument("--auto-open-devtools-for-tabs");
 
-            if(chromeOpts.WithVPN)
+            if (chromeOpts.WithVPN)
                 opts.AddExtension("C:\\Users\\ahmed\\Desktop\\2.7.3_0.crx");
 
 
@@ -52,11 +53,6 @@ namespace Nee
             {
                 pg.chrome = new ChromeDriver();
             }
-            
-
-
-
-
 
 
             Console.WriteLine("\n 1- Get Images \n 2- Get Videos");
@@ -169,6 +165,8 @@ namespace Nee
         private void GoAndDownloadOneVideo(string videoUri)
         {
 
+            OneVideoAttributesToDownload attributes = new OneVideoAttributesToDownload();
+
             this.chrome.Navigate().GoToUrl(videoUri);
 
             bool IsNeedRefresh = IsElementExist(By.XPath("//body/div[@id='sf-resetcontent']/h1"));
@@ -190,15 +188,24 @@ namespace Nee
                 this.chrome.SwitchTo().Window(this.MainWindow);
             }
 
-            var videoName = this.chrome.FindElement(By.TagName("meta")).GetDomAttribute("content");
+            attributes.VideoName = this.chrome.FindElement(By.TagName("meta")).GetDomAttribute("content");
+            attributes.BaseLocation = BaseLocation;
 
             var iframeSrc = this.chrome.FindElement(By.TagName("iframe")).GetAttribute("src");
 
-            string videoUrl = GetVideoUrlFromiFrame(iframeSrc, this.chrome.CurrentWindowHandle);
+            if (iframeSrc != "")
+            {
+                attributes.VideoUrl = GetVideoUrlFromiFrame(iframeSrc, this.chrome.CurrentWindowHandle);
+            }
+            else
+            {
+                attributes.VideoUrl = this.chrome.FindElement(By.Id("video_player_html5_api")).GetAttribute("src");
+            }
 
             this.chrome.Quit();
 
-            vid.DownloadVideo(videoUrl, videoName, BaseLocation);
+            vid.DownloadVideo(attributes);
+
         }
 
 
@@ -248,15 +255,27 @@ namespace Nee
                     this.chrome.SwitchTo().Window(this.MainWindow);
                 }
 
+                OneVideoAttributesToDownload attrubutes = new OneVideoAttributesToDownload
+                {
+                    VideoName = video.VideoName,
+                    BaseLocation = BaseLocation
+                };
 
                 var iframeSrc = this.chrome.FindElement(By.TagName("iframe")).GetAttribute("src");
 
-                string videoUrl = GetVideoUrlFromiFrame(iframeSrc, this.chrome.CurrentWindowHandle);
+                if(iframeSrc != "")
+                {
+                    attrubutes.VideoUrl = GetVideoUrlFromiFrame(iframeSrc, this.chrome.CurrentWindowHandle);
+                }
+                else
+                {
+                    attrubutes.VideoUrl = this.chrome.FindElement(By.Id("video_player_html5_api")).GetAttribute("src");
+                }
 
                 this.chrome.Close();
                 this.chrome.SwitchTo().Window(this.MainWindow);
 
-                vid.DownloadVideo(videoUrl, video.VideoName, BaseLocation);
+                vid.DownloadVideo(attrubutes);
 
             }
         }
