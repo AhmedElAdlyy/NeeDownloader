@@ -109,7 +109,7 @@ namespace Nee
                 }
                 else
                 {
-                    Console.WriteLine("fuck you!");
+                    Console.WriteLine("Wrong Choice");
                 }
 
                 pg.chrome.Quit();
@@ -309,7 +309,7 @@ namespace Nee
 
                     if (IsNeedSubscribe && imageCounter == 0)
                     {
-                        Console.WriteLine("Subscription is required will get you out of the shit");
+                        Console.WriteLine("Subscription is required, can't be downloaded");
                         this.chrome.Close();
                         this.chrome.SwitchTo().Window(this.MainWindow);
                     }
