@@ -153,7 +153,7 @@ namespace Nee
                 }
                 else
                 {
-                    Console.WriteLine("Fuck you");
+                    Console.WriteLine("Wrong Choice");
                 }
 
                 pg.chrome.Quit();
@@ -183,7 +183,7 @@ namespace Nee
 
             if (IsNeedSubscribe)
             {
-                Console.WriteLine("Subscription is required will get you out of the shit");
+                Console.WriteLine("website subscription is required, resource can't be downloaded");
                 this.chrome.Close();
                 this.chrome.SwitchTo().Window(this.MainWindow);
             }
@@ -309,7 +309,7 @@ namespace Nee
 
                     if (IsNeedSubscribe && imageCounter == 0)
                     {
-                        Console.WriteLine("Subscription is required, can't be downloaded");
+                        Console.WriteLine("Website subscription is required, resource can't be downloaded");
                         this.chrome.Close();
                         this.chrome.SwitchTo().Window(this.MainWindow);
                     }
@@ -329,7 +329,7 @@ namespace Nee
                 {
                     if (IsNeedSubscribe)
                     {
-                        Console.WriteLine("Subscription is required will get you out of the shit");
+                        Console.WriteLine("Website subscription is required, resource can't be downloaded");
                         this.chrome.Close();
                         this.chrome.SwitchTo().Window(this.MainWindow);
                     }
@@ -370,7 +370,7 @@ namespace Nee
 
             if (IsNeedSubscribe && imageCounter == 0)
             {
-                Console.WriteLine("Subscription is required will get you out of the shit");
+                Console.WriteLine("Website subscription is required, resource can't be downloaded");
                 this.chrome.Close();
                 this.chrome.SwitchTo().Window(this.MainWindow);
             }

@@ -1,5 +1,4 @@
 ﻿using NeeDownloader.ViewModels;
-using OpenQA.Selenium.DevTools.V117.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
